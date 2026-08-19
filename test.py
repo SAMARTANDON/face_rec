@@ -3,6 +3,7 @@ import os
 import  cv2
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 def load_known_faces(folder_path):
     
@@ -29,12 +30,12 @@ def load_known_faces(folder_path):
  
     return known_encodings, known_names
 
-known_face_encodings,known_face_names=load_known_faces('/home/samar/face_rec/pics')
+known_face_encodings,known_face_rolls=load_known_faces('/home/samar/face_rec/pics')
 
 # my_face_encoding now contains a universal 'encoding' of my facial features that can be compared to any other picture of a face!
 face_locations = []
 face_encodings = []
-face_names = []
+face_rolls = []
 process_this_frame = True
 
 video_capture = cv2.VideoCapture(0)
@@ -60,14 +61,14 @@ while True:
         # If a match was found in known_face_encodings, just use the first one.
         # if True in matches:
         #     first_match_index = matches.index(True)
-        #     name = known_face_names[first_match_index]
+        #     name = known_face_rolls[first_match_index]
 
         # Or instead, use the known face with the smallest distance to the new face
         face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
         best_match_index = np.argmin(face_distances)
         if matches[best_match_index]:
-            name = known_face_names[best_match_index]
-            face_names.append(name)
+            name = known_face_rolls[best_match_index]
+            face_rolls.append(name)
 
         # Draw a box around the face
         cv2.rectangle(frame, (left-30, top-30), (right+30, bottom+30), (0, 0, 255), 2)
@@ -84,10 +85,19 @@ while True:
     if cv2.waitKey(1) == 27:  
         break
 
-# Release handle to the webcam
 video_capture.release()
 cv2.destroyAllWindows()
-print(face_names)
-face_names=list(set(face_names))
-df = pd.DataFrame(face_names,columns=["Name"])
-df.to_csv("attendence_list.csv")
+df = pd.read_csv("attendence_list.csv")
+
+time = datetime.now().strftime("%Y-%m-%d %H")
+if time not in df.columns:
+    df[time] = 0
+
+face_rolls=list(set(face_rolls))
+print(face_rolls)
+
+for i, roll in enumerate(df["roll"]):
+    if roll in face_rolls:
+        df.at[i, time] = 1
+
+df.to_csv("attendence_list.csv",index=False)
