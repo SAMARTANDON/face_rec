@@ -2,6 +2,7 @@ import face_recognition
 import os
 import  cv2
 import numpy as np
+import pandas as pd
 
 def load_known_faces(folder_path):
     
@@ -66,6 +67,7 @@ while True:
         best_match_index = np.argmin(face_distances)
         if matches[best_match_index]:
             name = known_face_names[best_match_index]
+            face_names.append(name)
 
         # Draw a box around the face
         cv2.rectangle(frame, (left-30, top-30), (right+30, bottom+30), (0, 0, 255), 2)
@@ -85,3 +87,7 @@ while True:
 # Release handle to the webcam
 video_capture.release()
 cv2.destroyAllWindows()
+print(face_names)
+face_names=list(set(face_names))
+df = pd.DataFrame(face_names,columns=["Name"])
+df.to_csv("attendence_list.csv")
