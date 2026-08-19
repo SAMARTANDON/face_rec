@@ -29,7 +29,7 @@ def load_known_faces(folder_path):
  
     return known_encodings, known_names
 
-known_face_encodings,known_face_names=load_known_faces('/home/samar/Pictures/test')
+known_face_encodings,known_face_names=load_known_faces('/home/samar/face_rec/pics')
 
 # my_face_encoding now contains a universal 'encoding' of my facial features that can be compared to any other picture of a face!
 face_locations = []
